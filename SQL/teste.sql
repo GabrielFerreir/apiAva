@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION getData(
+
+) RETURNS TABLE(
+  "name" VARCHAR
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT u.name FROM users u;
+END;
+
+$$
+LANGUAGE plpgsql;
+
