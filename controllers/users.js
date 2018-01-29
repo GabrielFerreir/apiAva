@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const Validation = require('../validation/validation');
 
 function createUser(req, res) {
     const data = {
@@ -6,28 +7,17 @@ function createUser(req, res) {
         email: req.body.email,
         pass: req.body.pass
     };
-    let err = {
-        exists: false,
-        message: []
-    };
 
-    // VALIDAÇÕES
-    if(!data.name) {
-        err.exists = true; err.message.push('Nome é obrigatorio');
-    }
-    if(!data.email) {
-        err.exists = true; err.message.push('Email é obrigatorio');
-    }
-    if(!data.pass) {
-        err.exists = true; err.message.push('Senha é obrigatorio');
-    }
+    let validation = new Validation();
+    validation.isRequired(data.name, "O nome é obrigatorio");
+    validation.isRequired(data.email, "O email é obrigatorio");
+    validation.isRequired(data.pass, "O senha é obrigatoria");
 
-    if(err.exists) {
-        res.status(400).json({
-            message: err.message.join(', ')
-        });
+    if(!validation.isValid()) {
+        res.status(400).json(validation.errors());
         return
     }
+
     db.func('createUser', [data.name, data.email, data.pass])
         .then((result) => {
             res.status(200).json({
